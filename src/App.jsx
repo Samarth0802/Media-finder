@@ -1,5 +1,5 @@
 import React from 'react'
-import { getGif, getPhotos, getVideos } from './api/mediaApi'
+import { getGif, getPhotos, getVideos} from './api/mediaApi'
 
 const App = () => {
 
@@ -14,7 +14,7 @@ const App = () => {
   }
 
   async function gifData() {
-    const data = await getGif('cat')
+    const data = await getGif('cheeseburgers')
     console.log(data)
   }
 

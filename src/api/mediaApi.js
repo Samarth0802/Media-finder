@@ -38,12 +38,12 @@ export async function getVideos(query,page=1,per_page=40){
 }
 
 export async function getGif(query,per_page=25){
-    let response = await axios.get('https://api.giphy.com/v1/gifs/search',{
+    const response = await axios.get('https://api.giphy.com/v1/gifs/search',{
         params:{
+            api_key:giphy_key,
             q:query,
-            apikey:giphy_key,
             limit:per_page,
-        }
+        },
     })
     return response.data
 }
