@@ -7,7 +7,6 @@ const giphy_key = import.meta.env.VITE_GIPHY_KEY
 console.log(unsplash_key,pexels_key)
 
 export async function getPhotos(query,page=1,per_page=30){
-    console.log(JSON.stringify(unsplash_key))
     let response = await axios.get('https://api.unsplash.com/search/photos',{
         params:{
             query,
