@@ -2,14 +2,25 @@ import React, { useEffect } from 'react'
 import { getPhotos, getVideos, getGif } from '../api/mediaApi'
 import { setLoading, setError, setResultsPhotos, setResultsVideos, setResultsGifs } from '../redux/features/searchSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { store } from '../redux/store'  // ✅ Import store
 import loadingVideo from '../videos/loading.webm'
 import errorVideo from '../videos/Error 404.webm'
-
+import { setCollection, setCounter } from '../redux/features/collectionSlice'
 
 const ResultGrid = () => {
     const dispatch = useDispatch()
     const { query, activeTab, resultsPhotos, resultsVideos, resultsGifs, loading, error } = useSelector((store) => store.search)
+    const collection = useSelector((state) => state.collection.collection)
+    //const counter = useSelector((state)=>state.collection.counter)
 
+    //localStorage.setItem('collectionItems',JSON.stringify(collection))
+    
+    // ✅ Best way: useEffect
+    useEffect(() => {
+        console.log('✅ Collection updated:', collection)
+        console.log('✅ Total:', collection.length)
+    }, [collection])
+    
     const getData = async () => {
         if (!query) return
         
@@ -46,6 +57,18 @@ const ResultGrid = () => {
 
     const currentResults = getCurrentResults()
 
+    // ✅ Handle save with proper logging
+    const handleSave = (item) => {
+        dispatch(setCollection(item))
+        dispatch(setCounter())
+        // If you REALLY want setTimeout (not recommended):
+        setTimeout(() => {
+            // ✅ Store se directly padho
+            const latest = store.getState().collections.collection
+            console.log('From store after 1 min:', latest)
+        }, 60000)
+    }
+
     if (loading) {
         return (
             <div className='min-h-screen flex items-center justify-center'>
@@ -75,39 +98,62 @@ const ResultGrid = () => {
 
     return (
         <div className='p-4 min-h-screen'>
+            {/* Collection count */}
+            <div className='mb-4 text-white bg-purple-600 p-3 rounded-lg inline-block'>
+                <p className='text-lg font-semibold'>
+                    💾 Collection: {collection.length} items
+                </p>
+            </div>
+
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
                 {/* Photos */}
-                {activeTab === 'Photos' && resultsPhotos.map((photo) => (
+                {activeTab === 'Photos' && resultsPhotos.map((photo, idx) => (
                     <div key={photo.id} className='relative group overflow-hidden rounded-lg shadow-lg'>
                         <img 
                             src={photo.urls.small} 
                             alt={photo.alt_description}
                             className='w-full h-64 object-cover hover:scale-110 transition-transform duration-300'
                         />
-
+                        <button 
+                            className='text-white rounded-lg border-2 border-rose-100 mt-5 mb-2 px-2 py-1 active:scale-95 cursor-pointer hover:bg-purple-500 transition-all' 
+                            onClick={() => handleSave(resultsPhotos[idx])}
+                        >
+                            Save to Collection
+                        </button>
                     </div>
                 ))}
 
                 {/* Videos */}
-                {activeTab === 'Videos' && resultsVideos.map((video) => (
+                {activeTab === 'Videos' && resultsVideos.map((video, idx) => (
                     <div key={video.id} className='relative group overflow-hidden rounded-lg shadow-lg'>
                         <video 
                             src={video.video_files[0].link}
                             className='w-full h-64 object-cover'
                             controls
                         />
+                        <button 
+                            className='text-white rounded-lg border-2 border-rose-100 mt-5 mb-2 px-2 py-1 active:scale-95 cursor-pointer hover:bg-purple-500 transition-all' 
+                            onClick={() => handleSave(resultsVideos[idx])}
+                        >
+                            Save to Collection
+                        </button>
                     </div>
                 ))}
 
                 {/* Gifs */}
-                {activeTab === 'Gifs' && resultsGifs.map((gif) => (
+                {activeTab === 'Gifs' && resultsGifs.map((gif, idx) => (
                     <div key={gif.id} className='relative group overflow-hidden rounded-lg shadow-lg'>
                         <img 
                             src={gif.images.fixed_height.url}
                             alt={gif.title}
                             className='w-full h-64 object-cover'
                         />
-
+                        <button 
+                            className='text-white rounded-lg border-2 border-rose-100 mt-5 mb-2 px-2 py-1 active:scale-95 cursor-pointer hover:bg-purple-500 transition-all' 
+                            onClick={() => handleSave(resultsGifs[idx])}
+                        >
+                            Save to Collection
+                        </button>
                     </div>
                 ))}
             </div>
