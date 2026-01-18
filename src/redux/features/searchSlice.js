@@ -1,38 +1,33 @@
-// searchSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
-// Session storage se initial state load karo
+// ✅ Load from session on init
 const loadFromSession = () => {
     try {
-        const serializedState = sessionStorage.getItem('searchState')
-        if (serializedState === null) {
-            return {
-                query: '',
-                activeTab: 'Photos',
-                resultsPhotos: [],
-                resultsVideos: [],
-                resultsGifs: [],
-                loading: false,
-                error: null
-            }
+        const saved = sessionStorage.getItem('searchState')
+        if (saved) {
+            const parsed = JSON.parse(saved)
+            console.log('✅ Loaded from session:', parsed) // Debug log
+            return parsed
         }
-        return JSON.parse(serializedState)
     } catch (err) {
-        return {
-            query: '',
-            activeTab: 'Photos',
-            resultsPhotos: [],
-            resultsVideos: [],
-            resultsGifs: [],
-            loading: false,
-            error: null
-        }
+        console.error('❌ Load error:', err)
+    }
+    
+    console.log('📝 Using default state') // Debug log
+    return {
+        query: '',
+        activeTab: 'Photos',
+        resultsPhotos: [],
+        resultsVideos: [],
+        resultsGifs: [],
+        loading: false,
+        error: null
     }
 }
 
 export const searchSlice = createSlice({
     name: "search",
-    initialState: loadFromSession(), 
+    initialState: loadFromSession(),
     reducers: {
         setQuery: (state, actions) => {
             state.query = actions.payload
