@@ -4,7 +4,7 @@ import { setLoading, setError, setResultsPhotos, setResultsVideos, setResultsGif
 import { useDispatch, useSelector } from 'react-redux'
 import loadingVideo from '../videos/loading.webm'
 import errorVideo from '../videos/Error 404.webm'
-import { Download } from 'lucide-react' // Icon ke liye
+
 
 const ResultGrid = () => {
     const dispatch = useDispatch()
@@ -31,43 +31,6 @@ const ResultGrid = () => {
             dispatch(setError(err.message))
         }
     }
-
-    // Download function
-    // ResultGrid.jsx mein downloadMedia function ko update karo
-
-const downloadMedia = async (url, filename) => {
-    try {
-        // Check if it's a GIF from Giphy
-        if (url.includes('giphy.com') || url.includes('.gif')) {
-            // Direct download for GIFs (CORS bypass)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = filename
-            link.target = '_blank'
-            link.rel = 'noopener noreferrer'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-        } else {
-            // Fetch method for other media
-            const response = await fetch(url)
-            const blob = await response.blob()
-            const blobUrl = window.URL.createObjectURL(blob)
-            
-            const link = document.createElement('a')
-            link.href = blobUrl
-            link.download = filename
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            window.URL.revokeObjectURL(blobUrl)
-        }
-    } catch (error) {
-        console.error('Download failed:', error)
-        // Fallback - open in new tab
-        window.open(url, '_blank')
-    }
-}
 
     useEffect(() => {
         if (query) {
@@ -121,13 +84,7 @@ const downloadMedia = async (url, filename) => {
                             alt={photo.alt_description}
                             className='w-full h-64 object-cover hover:scale-110 transition-transform duration-300'
                         />
-                        {/* Download button */}
-                        <button
-                            onClick={() => downloadMedia(photo.urls.full, `photo-${photo.id}.jpg`)}
-                            className='absolute bottom-2 right-2 bg-purple-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-purple-600'
-                        >
-                            <Download size={20} />
-                        </button>
+
                     </div>
                 ))}
 
@@ -150,12 +107,7 @@ const downloadMedia = async (url, filename) => {
                             alt={gif.title}
                             className='w-full h-64 object-cover'
                         />
-                        <button
-                            onClick={() => downloadMedia(gif.images.original.url, `gif-${gif.id}.gif`)}
-                            className='absolute bottom-2 right-2 bg-purple-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-purple-600'
-                        >
-                            <Download size={20} />
-                        </button>
+
                     </div>
                 ))}
             </div>
